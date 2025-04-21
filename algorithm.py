@@ -30,7 +30,7 @@ class Encoding:
 
 
 
-    def __init__(self, nperseg=128, noverlap=32, time_window = 1., freq_window = 1500):
+    def __init__(self, nperseg=128, noverlap=32, min_distance = 50, time_window = 1., freq_window = 1500):
 
         """
         Class constructor
@@ -54,6 +54,7 @@ class Encoding:
         self.noverlap = noverlap
         self.time_window = time_window
         self.freq_window = freq_window
+        self.min_distance = min_distance
 
     def process(self, fs, s):
 
@@ -94,7 +95,29 @@ class Encoding:
 
         # Insert code here
         self.f, self.t, self.S = spectrogram(s, fs, nperseg=self.nperseg, noverlap=self.noverlap)
-        self.anchors = np.array([[t, f] for [f, t] in peak_local_max(self.S, min_distance=4, exclude_border=False) if f < self.freq_window])
+        self.anchors = np.array([[t, f] for [f, t] in peak_local_max(self.S, min_distance=self.min_distance, exclude_border=False) if f < 5000])
+
+
+        # extract hash from anchors
+
+        hash = []
+        for (itime, ifreq) in self.anchors :
+            time = self.t[itime]
+            freq = self.f[ifreq]
+
+            for (target_itime, target_ifreq) in self.anchors :            
+               target_time = self.t[target_itime]
+               target_freq = self.f[target_ifreq]
+
+               if target_time < time or target_time > time + self.time_window or abs(target_freq - freq) > self.freq_window : continue
+
+               hash.append([target_time - time, freq, target_freq])
+
+
+        self.hashes = hash
+         
+         # This hash representation is time invariant as only the time difference between the anchor and the target is saved.
+         # Thus, the pattern or melody saved in the hash can be recognized at any time of song.
 
 
 

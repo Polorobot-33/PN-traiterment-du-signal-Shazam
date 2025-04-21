@@ -18,13 +18,13 @@ if __name__ == '__main__':
     # 2: Encoder
     nperseg=8192
     noverlap=1024
-    min_distance=25
+    min_distance=4#25
     time_window=1.
     freq_window=1500
     encoder = Encoding(nperseg=nperseg, noverlap=noverlap, 
       time_window=time_window, 
-      freq_window=freq_window,)
-      #min_distance=min_distance)
+      freq_window=freq_window,
+      min_distance=min_distance)
       
    
     # 3: Randomly get an extract from one of the songs of the database

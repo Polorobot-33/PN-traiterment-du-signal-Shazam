@@ -27,9 +27,9 @@ if __name__ == '__main__':
     audiofiles = [item for item in audiofiles if item[-4:] =='.wav']
 
     # 2: Set the parameters of the encoder
-    nperseg=128
-    noverlap=32
-    min_distance=50
+    nperseg=8192#128
+    noverlap=1024#32
+    min_distance=50#4
     time_window=1.
     freq_window=1500
     encoder = Encoding(nperseg=nperseg, noverlap=noverlap, 
