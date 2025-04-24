@@ -95,7 +95,7 @@ class Encoding:
 
         # Insert code here
         self.f, self.t, self.S = spectrogram(s, fs, nperseg=self.nperseg, noverlap=self.noverlap)
-        self.anchors = np.array([[t, f] for [f, t] in peak_local_max(self.S, min_distance=self.min_distance, exclude_border=False) if f < 5000])
+        self.anchors = np.array([[t, f] for [f, t] in peak_local_max(self.S, min_distance=self.min_distance, exclude_border=False, threshold_rel = 0.01)])
 
 
         # extract hash from anchors
@@ -111,7 +111,7 @@ class Encoding:
 
                if target_time < time or target_time > time + self.time_window or abs(target_freq - freq) > self.freq_window : continue
 
-               hash.append([target_time - time, freq, target_freq])
+               hash.append({'t' : time, 'hash':np.array([target_time - time, freq, target_freq])})
 
 
         self.hashes = hash
@@ -136,7 +136,7 @@ class Encoding:
         plt.pcolormesh(self.t, self.f/1e3, self.S, shading='gouraud')
         plt.xlabel('Time [s]')
         plt.ylabel('Frequency [kHz]')
-        plt.ylim([0, self.freq_window*1e-3])
+        plt.ylim([0, 2])
         if(display_anchors) :
             plt.scatter(self.t[self.anchors[:, 0]], self.f[self.anchors[:, 1]]/1e3)
         plt.show()
@@ -223,8 +223,24 @@ class Matching:
         # TODO: complete the implementation of the class by
         # 1. creating an array "offset" containing the time offsets of the 
         #    hashcodes that match
+
+        self.offsets = self.matching[:, 1] - self.matching[:, 0]
+
+
         # 2. implementing a criterion to decide whether or not both extracts
-        #    match
+        #    match     
+           
+        # The criterion that can be used is if the max of the histogram is greater
+        # than a given n number of times the average value of the non null values.
+        # Null values are not considered as they depend on the number of match,
+        # which is not a good indicator of whether or not two samples match.
+        # We use n = 3 here
+
+        histogram = [h for h in np.histogram(self.offsets, bins=100, density=True)[0] if h > 0]
+        mean = np.mean(histogram)
+        max = np.max(histogram)
+        self.match = max > 3 * mean
+        print(f'Mean : {mean}, max : {max}, samples match : {self.match}')
        
              
     def display_scatterplot(self):

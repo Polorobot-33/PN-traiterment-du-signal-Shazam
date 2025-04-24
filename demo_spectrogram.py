@@ -11,11 +11,7 @@ from algorithm import *
 # ----------------------------------------------
 if __name__ == '__main__':
 
-    # 1: Load the database
-    with open('songs.pickle', 'rb') as handle:
-        database = pickle.load(handle)
-
-    # 2: Encoder
+    # 1: Encoder
     nperseg=8196
     noverlap=1024
     min_distance=4#25
@@ -27,7 +23,7 @@ if __name__ == '__main__':
       min_distance=min_distance)
       
    
-    # 3: Randomly get an extract from one of the songs of the database
+    # 2: Randomly get an extract from one of the songs of the database
     songs = [item for item in os.listdir('./samples') if item[:-4] != '.wav']
     song = random.choice(songs)
     print('Selected song: ' + song[:-4])
@@ -38,14 +34,9 @@ if __name__ == '__main__':
     tmin = int(tstart*fs)
     duration = int(10*fs)
 
-    # 4: Use the encoder to extract a signature from the extract
+    # 3: Use the encoder to extract a signature from the extract
     encoder.process(fs, s[tmin:tmin + duration])
-    hashes = encoder.hashes
-
     encoder.display_spectrogram(True)
-
-    # 5: TODO: Using the class Matching, compare the fingerprint to all the 
-    # fingerprints in the database
     
 
 
