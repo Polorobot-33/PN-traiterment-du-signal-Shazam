@@ -46,6 +46,19 @@ if __name__ == '__main__':
 
     # 5: TODO: Using the class Matching, compare the fingerprint to all the 
     # fingerprints in the database
+    tab=[]
+    for song_test in songs:
+        filename = './samples/' + song_test
+        fs, s = read(filename)
+        encoder.process(fs, s)
+        hashes_test = encoder.hashes
+        matching=Matching(hashes,hashes_test)
+        tab.append(matching.match)
+    i=np.argmax(tab)
+    print('Correspondance avec : ' + songs[i][:-4])
+        
+        
+        #matching.display_histogram()
     
 
 

@@ -239,7 +239,7 @@ class Matching:
         histogram = [h for h in np.histogram(self.offsets, bins=100, density=True)[0] if h > 0]
         mean = np.mean(histogram)
         max = np.max(histogram)
-        self.match = max > 3 * mean
+        self.match = max/mean
         print(f'Mean : {mean}, max : {max}, samples match : {self.match}')
        
              
